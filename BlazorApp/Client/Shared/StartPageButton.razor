@@ -1,0 +1,14 @@
+﻿@inject NavigationManager NavigationManager
+
+<button @onclick="GoToStartPage"
+        class="btn btn-primary home-button">
+    <span class="oi oi-magnifying-glass"></span>
+    New search
+</button>
+
+@code {
+    private void GoToStartPage()
+    {
+        NavigationManager.NavigateTo("");
+    }
+}

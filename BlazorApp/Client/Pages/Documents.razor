@@ -1,0 +1,35 @@
+﻿@page "/documents"
+@page "/documents/{searchTerm}"
+@inject IDocumentService DocumentService
+@inject NavigationManager NavigationManager
+
+<PageHeader />
+
+<PageTitle>Search results</PageTitle>
+
+<div class="headingDiv">
+    <h3>@DocumentService.PageHeading</h3>
+</div>
+
+<StartPageButton />
+
+
+@if (DocumentService.Documents == null)
+{
+    <SfSpinner Visible=true Label="Loading data..."></SfSpinner>
+}
+else
+{
+    <SfGrid DataSource="@DocumentService.Documents" AllowPaging="true" AllowSorting=true>
+        <GridPageSettings PageSize="20" PageCount="5"></GridPageSettings>
+        <GridColumns>
+            <GridColumn Field="@nameof(Document.Id)" HeaderText="Document Id" Width="150px"></GridColumn>
+            <GridColumn Field="@nameof(Document.Display_Title)" HeaderText="Document Title"></GridColumn>
+        </GridColumns>
+    </SfGrid>
+}
+
+@code {
+    [Parameter]
+    public string? SearchTerm { get; set; }
+}

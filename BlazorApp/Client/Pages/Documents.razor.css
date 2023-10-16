@@ -1,0 +1,15 @@
+.headingDiv {
+    margin-top: 25px;
+}
+
+.page-selection{
+    margin-right: 15px;
+    margin-bottom: 30px;
+}
+
+.sortButton {
+    font-size: 14px;
+    border: none;
+    background: none;
+    margin-left: 30px;
+}

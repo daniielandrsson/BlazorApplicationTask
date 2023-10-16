@@ -1,0 +1,113 @@
+﻿@using System.ComponentModel.DataAnnotations;
+@using System.Web;
+@using System.Text.RegularExpressions;
+@inject NavigationManager NavigationManager
+@inject IDocumentService DocumentService
+
+<div class="input-group inputContainer">
+    <EditForm Model="SearchInput">
+        <DataAnnotationsValidator />
+        <p class="p_index">Use the 'Display title' field to search for documents with a specific word in the title.</p>
+        <label class="inputTextLabel" for="displayTitle"><b>Display title:</b></label>
+        <InputText id="displayTitle" class="form-control searchInput" placeholder="Enter display title" @bind-Value="SearchInput.SearchTerm_display_title" @onkeyup="DoSearch" />
+        <ValidationMessage For="@(() => SearchInput.SearchTerm_display_title)" />
+
+        <p class="p_index">Use the 'Query parameter' field to search with any query parameter. <br /> Example: count=Sweden</p>
+        <label class="inputTextLabel" for="queryParam"><b>Query parameter:</b></label>
+        <InputText id="queryParam" class="form-control searchInput" placeholder="Enter query parameter" @bind-Value="SearchInput.SearchTerm_query" @onkeyup="DoSearch" />
+        <ValidationMessage For="@(() => SearchInput.SearchTerm_query)" />
+
+        <div class="input-group-append searchButton">
+            <button class="btn btn-primary"
+                    type="submit"
+            @onclick="SearchDocument">
+                <span class="oi oi-magnifying-glass"></span>
+                Find documents
+            </button>
+        </div>
+    </EditForm>
+</div>
+
+@if (ShowLoading)
+{
+    <SfSpinner Visible="true" Label="Loading data..."></SfSpinner>
+}
+
+
+@code {
+    private bool ShowLoading = false;
+    private string SearchTerm;
+    private bool isValid = false;
+
+    public async Task SearchDocument()
+    {
+        CheckIsValid();
+        if (isValid)
+        {
+            ShowLoading = true;
+            await DocumentService.SearchDocuments(SearchTerm);
+
+            NavigationManager.NavigateTo($"/documents/{SearchTerm}");
+        }
+    }
+
+    // Check to see if 'Enter' was pressed
+    public async Task DoSearch(KeyboardEventArgs eventArgs)
+    {
+        if (eventArgs.Key.Equals("Enter"))
+        {
+            await SearchDocument();
+        }
+    }
+
+    // Validation of user input 
+    private void CheckIsValid()
+    {
+        if (SearchInput.SearchTerm_display_title != null || SearchInput.SearchTerm_query != null)
+        {
+            SearchTerm = string.Empty;
+            string regexPattern = @"^[a-zA-Z0-9=\s]*$";
+            string displayTitle = "display_title=";
+            string queryParameter = "query_parameter=";
+
+            if (!string.IsNullOrEmpty(SearchInput.SearchTerm_display_title))
+            {
+                if (Regex.IsMatch(SearchInput.SearchTerm_display_title, regexPattern) || SearchInput.SearchTerm_display_title.Length >= 2)
+                {
+                    isValid = true;
+                    displayTitle += HttpUtility.UrlEncode(SearchInput.SearchTerm_display_title);
+                    SearchTerm += displayTitle;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(SearchInput.SearchTerm_query))
+            {
+                if (Regex.IsMatch(SearchInput.SearchTerm_query, regexPattern) || SearchInput.SearchTerm_query.Length >= 2)
+                    isValid = true;
+                queryParameter += HttpUtility.UrlEncode(SearchInput.SearchTerm_query);
+
+                if (!string.IsNullOrEmpty(SearchInput.SearchTerm_display_title))
+                    SearchTerm += "&";
+
+                SearchTerm += queryParameter;
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/documents");
+        }
+    }
+
+    public class ValidationModel
+    {
+        [RegularExpression(@"^[a-zA-Z0-9=\s]*$", ErrorMessage = "You have entered an invalid character")]
+        [MinLength(2, ErrorMessage = "This field needs at least 2 characters")]
+        public string? SearchTerm_display_title { get; set; }
+
+        [RegularExpression(@"^[a-zA-Z0-9=\s]*$", ErrorMessage = "You have entered an invalid character")]
+        [MinLength(2, ErrorMessage = "This field needs at least 2 characters")]
+        public string? SearchTerm_query { get; set; }
+    }
+
+    private ValidationModel SearchInput = new ValidationModel();
+}
