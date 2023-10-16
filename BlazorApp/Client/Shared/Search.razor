@@ -7,12 +7,12 @@
 <div class="input-group inputContainer">
     <EditForm Model="SearchInput">
         <DataAnnotationsValidator />
-        <p class="p_index">Use the 'Display title' field to search for documents with a specific word in the title.</p>
+        <p class="p_index"><b>Use the 'Display title' field to search for documents with a specific word in the title.</b></p>
         <label class="inputTextLabel" for="displayTitle"><b>Display title:</b></label>
         <InputText id="displayTitle" class="form-control searchInput" placeholder="Enter display title" @bind-Value="SearchInput.SearchTerm_display_title" @onkeyup="DoSearch" />
         <ValidationMessage For="@(() => SearchInput.SearchTerm_display_title)" />
 
-        <p class="p_index">Use the 'Query parameter' field to search with any query parameter. <br /> Example: count=Sweden</p>
+        <p class="p_index"><b>Use the 'Query parameter' field to search with any query parameter.</b> <br /> Example: count=Sweden</p>
         <label class="inputTextLabel" for="queryParam"><b>Query parameter:</b></label>
         <InputText id="queryParam" class="form-control searchInput" placeholder="Enter query parameter" @bind-Value="SearchInput.SearchTerm_query" @onkeyup="DoSearch" />
         <ValidationMessage For="@(() => SearchInput.SearchTerm_query)" />
